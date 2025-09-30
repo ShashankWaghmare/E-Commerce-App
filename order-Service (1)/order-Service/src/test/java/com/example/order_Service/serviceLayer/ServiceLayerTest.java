@@ -17,7 +17,10 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.InjectMocks;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
+
+import java.util.Optional;
 
 import org.springframework.security.core.Authentication;
 
@@ -63,4 +66,24 @@ public class ServiceLayerTest {
 		Mockito.verify(orderEventProducer).sendOrderEvent(any(OrderEvent.class));
 		SecurityContextHolder.clearContext();
 	}
+	
+	@Test
+    public void getOrderTest() {
+        // Prepare mock order
+        Order order = new Order();
+        order.setId(1L);
+        order.setOrderNumber("123456");
+        order.setStatus(OrderStatus.NEW);
+        order.setQuantity(5);
+        // Mock repository
+        Mockito.when(orderRepository.findById(1L)).thenReturn(Optional.of(order));
+
+        // Call service
+        Order result = orderServiceImpl.getOrder(1L);
+
+        // Assertions
+        assertNotNull(result);
+        assertEquals(1L, result.getId());
+        assertEquals("123456", result.getOrderNumber());
+    }
 }
